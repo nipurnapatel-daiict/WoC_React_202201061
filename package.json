@@ -16,18 +16,22 @@
     "@codemirror/theme-one-dark": "^6.1.2",
     "@monaco-editor/react": "^4.6.0",
     "@uiw/react-codemirror": "^4.23.7",
+    "aos": "^2.3.4",
     "axios": "^1.7.9",
     "codemirror": "^6.0.1",
     "firebase": "^11.2.0",
     "lucide-react": "^0.469.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-redux": "^9.2.0",
     "react-resizable": "^3.0.5",
     "react-resizable-panels": "^2.1.7",
     "react-rnd": "^10.4.14",
     "react-router-dom": "^7.1.1",
     "react-split-pane": "^0.1.92",
-    "react-toastify": "^11.0.3"
+    "react-toastify": "^11.0.3",
+    "redux": "^5.0.1",
+    "redux-thunk": "^3.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

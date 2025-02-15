@@ -3,7 +3,7 @@ import SplitPane from "react-split-pane";
 import Output from "./Output";
 import InputSection from "./InputSection";
 
-const Merge = ({isOutputVisible, output, isLoading, inputData, onInputChange, showOutput}) => {
+const Merge = ({isOutputVisible, output, isLoading, inputData, onInputChange, showOutput, border, color}) => {
     const [input, setInput] = useState("");  
     
     return (
@@ -35,10 +35,10 @@ const Merge = ({isOutputVisible, output, isLoading, inputData, onInputChange, sh
                     <div style={{ backgroundColor: "green", height: "100%" }}>
                         <InputSection
                             inputData={inputData}
+                            onInputChange={onInputChange}
                             isOutputVisible={isOutputVisible}
                             border="border-r"
                             color="text-white"
-                            onInputChange={onInputChange}
                             showOutput={showOutput}
                         />
                     </div>
@@ -51,6 +51,8 @@ const Merge = ({isOutputVisible, output, isLoading, inputData, onInputChange, sh
                             isLoading={isLoading}
                             showOutput={showOutput}
                             // inputData={inputData}
+                            border={border}
+                            color={color}
                         />
                     </div>
                 </SplitPane>

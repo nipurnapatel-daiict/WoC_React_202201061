@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 
-const InputSection = ({ input, isOutputVisible, border, color, onInputChange, showOutput }) => {
-    const [opacity, setOpacity] = useState(1);  // Keep opacity visible
+const InputSection = ({ inputData, onInputChange, isOutputVisible, border, color, showOutput }) => {
+    const [opacity, setOpacity] = useState(1);  
 
-    // Function to handle file upload
+    // handle file upload
     const handleFileUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -18,9 +18,9 @@ const InputSection = ({ input, isOutputVisible, border, color, onInputChange, sh
 
     useEffect(() => {
         if (isOutputVisible || showOutput) {
-            setOpacity(1);  // Fade in when output is visible
+            setOpacity(1);  
         } else {
-            setOpacity(0);  // Fade out when output is not visible
+            setOpacity(0);  
         }
     }, [isOutputVisible, showOutput]);
 
@@ -28,12 +28,12 @@ const InputSection = ({ input, isOutputVisible, border, color, onInputChange, sh
         <div
             className={`rounded ${border} overflow-hidden transition-all duration-500 ease-in-out`}
             style={{
-                backgroundColor: '#2d3748',  // Gray background
-                opacity: opacity, // Smooth opacity transition
-                transition: "opacity 0.5s ease-in-out", // Fade effect
-                zIndex: 10, // Ensure input section stays above other content when visible
-                overflowY: 'hidden', // Handle overflow of content
-                height: '100%',  // Use 100% height so it takes full available space in its container
+                backgroundColor: '#2d3748', 
+                opacity: opacity, 
+                transition: "opacity 0.5s ease-in-out", 
+                zIndex: 10,
+                overflowY: 'hidden', 
+                height: '100%',  
             }}
         >
             <div className="p-4">
@@ -43,7 +43,7 @@ const InputSection = ({ input, isOutputVisible, border, color, onInputChange, sh
                     <div className="mb-2">
                         <input
                             type="file"
-                            accept=".txt, .json" // You can specify the file types you want to allow
+                            accept=".txt, .json" 
                             onChange={handleFileUpload}
                             className="bg-gray-600 hover:bg-gray-800 text-white px-1 py-1 rounded-md cursor-pointer"
                         />
@@ -53,11 +53,11 @@ const InputSection = ({ input, isOutputVisible, border, color, onInputChange, sh
                 </div>
 
                 <textarea
-                    className="p-2 bg-neutral-700 text-white rounded-md w-full placeholder-gray-400"  // Tailwind utility classes
+                    className="p-2 bg-neutral-700 text-white rounded-md w-full placeholder-gray-400" 
                     placeholder="Enter input data for your code here"
-                    value={input}  // Ensure `input` is being passed correctly
-                    onChange={(e) => onInputChange(e.target.value)}  // Ensure the onChange handler updates state
-                    rows={6}  // 6 visible lines for the textarea
+                    value={inputData}  
+                    onChange={(e) => onInputChange(e.target.value)}  
+                    rows={6}  
                 />
 
                 {/* File input section */}
@@ -67,4 +67,4 @@ const InputSection = ({ input, isOutputVisible, border, color, onInputChange, sh
     );
 };
 
-export default InputSection;
+export default InputSection; 

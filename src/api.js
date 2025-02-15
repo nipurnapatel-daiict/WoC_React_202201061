@@ -24,13 +24,17 @@
 import axios from "axios";
 import { LANGUAGE_VERSIONS } from "./constants";
 
+console.log(LANGUAGE_VERSIONS);
+
 const API = axios.create({
     baseURL : "https://emkc.org/api/v2/piston"
 });
 
 export const executeCode = async (language, sourceCode, input) => {
-    console.log("Sending request with language:", language);
-    console.log("Input Data:", input); // Log the input data to check it
+//    console.log("Running code with language in api:", language);
+
+//    console.log("Sending request with language:", language);
+//    console.log("Input Data api:", input); // Log the input data to check it
 
     const response = await API.post("execute", {
         language: language,

@@ -4,7 +4,7 @@ import { FooterItems } from "../constants";
 
 const Footer = () => {
     return (
-        <footer className="mt-20 bg-neutral-800 text-white py-6">
+        <footer className=" bg-neutral-800 text-white py-6">
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-center mb-6">
                     <h3 className="flex items-center space-x-2 text-center">

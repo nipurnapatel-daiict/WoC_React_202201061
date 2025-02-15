@@ -7,6 +7,10 @@ import { Search } from 'lucide-react';
 import { User } from 'lucide-react';
 import { Terminal } from 'lucide-react';
 import { MessageSquareText } from 'lucide-react';
+import { House } from 'lucide-react';
+import { Files } from 'lucide-react';
+import { Star } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 
 // import { javascript } from '@codemirror/lang-javascript';
 // import { python } from '@codemirror/lang-python';
@@ -120,3 +124,17 @@ export const CODE_SNIPPETS = {
     cpp: `// C++ snippet\n#include <iostream>\nusing namespace std;\nint main() { cout << "Hello, World!"; return 0; }`
 };
   
+
+// ----------------------File Management --------
+export const Navlist=[
+    {
+        id:1,
+        name:'Home',
+        logo : <House />,
+    },
+    {
+        id:4,
+        name:'Trash',
+        logo : <Trash2 />,
+    },
+]

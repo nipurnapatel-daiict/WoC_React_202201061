@@ -1,111 +1,132 @@
-import react, { useState } from "react";
-import {getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword} from "firebase/auth";
+import React, { useState } from "react";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-    const auth = getAuth();
-    const navigate = useNavigate();
+  const auth = getAuth();
+  const navigate = useNavigate();
 
-    const [authing, setAuthing] = useState(false);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+  const [authing, setAuthing] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-    const signInWithGoogle = async () => {
-        setAuthing(true);
-        
-        //for sign-up with google
-        signInWithPopup(auth, new GoogleAuthProvider())
-            .then(response => {
-                console.log(response.user.uid);
-                navigate("/code-editor");
+  const signInWithGoogle = async () => {
+    setAuthing(true);
 
-            })
-            .catch(error => {
-                console.log(error);
-                setAuthing(false);
-            })
-    }
+    // Sign-in with Google
+    signInWithPopup(auth, new GoogleAuthProvider())
+      .then((response) => {
+        console.log(response.user.uid);
+        navigate("/files");
+      })
+      .catch((error) => {
+        console.log(error);
+        setAuthing(false);
+      });
+  };
 
-    const signInWithEmail = async () =>{
-        setAuthing(true);
-        setError("");
+  const signInWithEmail = async () => {
+    setAuthing(true);
+    setError("");
 
-        signInWithEmailAndPassword(auth, email, password)
-            .then(response => {
-                console.log(response.user.uid);
-                navigate("/code-editor")
-            })
-            .catch(error => {
-                console.log(error);
-                setError(error.message);
-                setAuthing(false);
-            })
-    }
+    signInWithEmailAndPassword(auth, email, password)
+      .then((response) => {
+        console.log(response.user.uid);
+        // navigate("/code-editor");
+        navigate("/files");
 
-    return (
-        <div className="w-full h-screen flex">
-            {/* left half */}
-            <div className="w-1/2 h-full flex flex-col bg-[#282c34] items-center justify-center">
-            </div>
+      })
+      .catch((error) => {
+        console.log(error);
+        setError(error.message);
+        setAuthing(false);
+      });
+  };
 
-
-            {/* right half */}
-            <div className="w-1/2 h-full bg-[#1a1a1a] flex flex-col p-20 justify-center">
-                <div className="w-full flex flex-col max-w-[450px] mx-auto">
-                    <div className='w-full flex flex-col mb-10 text-white'>
-                        <h3 className='text-4xl font-bold mb-2'>Sign Up</h3>
-                        <p className='text-lg mb-4'>Welcome! Please enter your information below to begin.</p>
-                    </div>
-
-                </div>
-
-                <div className='w-full flex flex-col mb-6'>
-                        <input
-                            type='email'
-                            placeholder='Email'
-                            className='w-full text-white py-2 mb-4 bg-transparent border-b border-gray-500 focus:outline-none focus:border-white'
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
-                        <input
-                            type='password'
-                            placeholder='Password'
-                            className='w-full text-white py-2 mb-4 bg-transparent border-b border-gray-500 focus:outline-none focus:border-white'
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                </div>
-            
-                <div className='w-full flex flex-col mb-4'>
-                        <button
-                            onClick={signInWithEmail}
-                            disabled={authing}
-                            className='w-full bg-transparent border border-white text-white my-2 font-semibold rounded-md p-4 text-center flex items-center justify-center cursor-pointer'>
-                            Log in With Email and Password
-                        </button>
-                </div>
-
-                {error && <div className='text-red-500 mb-4'>{error}</div>}
-
-                <div className='w-full flex items-center justify-center relative py-4'>
-                    <div className='w-full h-[1px] bg-gray-500'></div>
-                    <p className='text-lg absolute text-gray-500 bg-[#1a1a1a] px-2'>OR</p>
-                </div>
-
-                <button
-                        onClick={signInWithGoogle}
-                        disabled={authing}
-                        className='w-full bg-white text-black font-semibold rounded-md p-4 text-center flex items-center justify-center cursor-pointer mt-7'>
-                        Log in With Google
-                </button>
-
-                <div className='w-full flex items-center justify-center mt-10'>
-                    <p className='text-sm font-normal text-gray-400'>Don't have an account? <span className='font-semibold text-white cursor-pointer underline'><a href='/signup'>Sign Up</a></span></p>
-                </div>
-            </div>
+  return (
+    <div className="w-full h-screen flex items-center justify-center bg-[#EDF2F7]">
+      {/* Main Container */}
+      <div className="flex w-full max-w-screen-lg h-[90vh] bg-white shadow-lg rounded-lg overflow-hidden">
+        {/* Left Side */}
+        <div className="w-1/2 flex items-center justify-center bg-[#2D3748]">
+          <div className="text-white text-4xl font-semibold max-w-[70%] text-center p-8">
+            <p>
+              Welcome back to the most dynamic coding community! Create, code,
+              and collaborate effortlessly.
+            </p>
+          </div>
         </div>
-    )
-}
+
+        {/* Right Side (Login Form) */}
+        <div className="w-1/2 flex items-center justify-center p-8">
+          <div className="w-full max-w-lg bg-white p-8 rounded-lg shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl">
+            <h2 className="text-4xl font-bold text-center text-[#4A90E2] mb-6">
+              Log In to Your Account
+            </h2>
+
+            <div className="space-y-6">
+              <input
+                type="email"
+                placeholder="Email Address"
+                className="w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A90E2] transition duration-300"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                className="w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A90E2] transition duration-300"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+
+              {error && (
+                <p className="text-red-500 text-center mt-2">{error}</p>
+              )}
+
+              <button
+                onClick={signInWithEmail}
+                disabled={authing}
+                className="w-full py-3 bg-[#4A90E2] text-white font-semibold rounded-lg shadow-lg hover:bg-[#357ABD] transition duration-300 transform hover:scale-105"
+              >
+                {authing ? "Logging In..." : "Log In with Email"}
+              </button>
+
+              <div className="text-center py-4">
+                <span className="text-gray-500">or</span>
+              </div>
+
+              <button
+                onClick={signInWithGoogle}
+                disabled={authing}
+                className="w-full py-3 bg-white text-[#4A90E2] font-semibold rounded-lg shadow-lg border-2 border-[#4A90E2] hover:bg-[#E3F2FD] transition duration-300 transform hover:scale-105"
+              >
+                {authing ? "Logging In..." : "Log In with Google"}
+              </button>
+
+              <div className="mt-6 text-center">
+                <p className="text-sm text-gray-500">
+                  Don’t have an account?{" "}
+                  <a
+                    href="/signup"
+                    className="text-[#4A90E2] font-semibold hover:underline"
+                  >
+                    Sign Up
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default Login;

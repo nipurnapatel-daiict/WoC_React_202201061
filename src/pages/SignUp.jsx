@@ -1,122 +1,164 @@
-import React, { useState } from "react";
-import { getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
+import React, { useState, useEffect } from "react";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
-    const auth = getAuth();
-    const navigate = useNavigate();
-    
-    const [authing, setAuthing] = useState(false);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setError] = useState('');
+  const auth = getAuth();
+  const navigate = useNavigate();
 
-    const signUpWithGoogle = async () => {
-        setAuthing(true);
-        
-        // Use Firebase to sign up with Google
-        signInWithPopup(auth, new GoogleAuthProvider())
-            .then(response => {
-                console.log(response.user.uid);
-                navigate("/login");
-            })
-            .catch(error => {
-                console.log(error);
-                setAuthing(false);
-            });
-    };
+  const [authing, setAuthing] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [typedText, setTypedText] = useState("");
+  const [index, setIndex] = useState(0);
 
-    const signUpWithEmail = async () => {
-        // Check if passwords match
-        if (password !== confirmPassword) {
-            setError('Passwords do not match');
-            return;
-        }
+  const typingEffectText =
+    "Join the most dynamic coding community! Create, code, and collaborate effortlessly.";
 
-        setAuthing(true);
-        setError('');
+  const signUpWithGoogle = async () => {
+    setAuthing(true);
 
-        createUserWithEmailAndPassword(auth, email, password)
-            .then(response => {
-                console.log(response.user.uid);
-                navigate("/login");
-            })
-            .catch(error => {
-                console.log(error);
-                setError(error.message);
-                setAuthing(false);
-            });
-    };
+    signInWithPopup(auth, new GoogleAuthProvider())
+      .then((response) => {
+        console.log(response.user.uid);
+        navigate("/login");
+      })
+      .catch((error) => {
+        console.log(error);
+        setAuthing(false);
+      });
+  };
 
-    return (
-        <div className="w-full h-screen flex">
-             <div className='w-1/2 h-full flex flex-col bg-[#282c34] items-center justify-center'>
-             </div>
+  const signUpWithEmail = async () => {
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
 
-             {/* right half */}
-             <div className="w-1/2 h-full bg-[#1a1a1a] flex flex-col p-20 justify-center">
-                <div className="w-full flex flex-col max-w-[450px] mx-auto">
-                    <div className='w-full flex flex-col mb-10 text-white'>
-                        <h3 className='text-4xl font-bold mb-2'>Sign Up</h3>
-                        <p className='text-lg mb-4'>Welcome! Please enter your information below to begin.</p>
-                    </div>
+    setAuthing(true);
+    setError("");
 
-                    <div className='w-full flex flex-col mb-6'>
-                        <input
-                            type='email'
-                            placeholder='Email'
-                            className='w-full text-white py-2 mb-4 bg-transparent border-b border-gray-500 focus:outline-none focus:border-white'
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
-                        <input
-                            type='password'
-                            placeholder='Password'
-                            className='w-full text-white py-2 mb-4 bg-transparent border-b border-gray-500 focus:outline-none focus:border-white'
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                        <input
-                            type='password'
-                            placeholder='Re-Enter Password'
-                            className='w-full text-white py-2 mb-4 bg-transparent border-b border-gray-500 focus:outline-none focus:border-white'
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                        />
-                    </div>
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((response) => {
+        console.log(response.user.uid);
+        navigate("/login");
+      })
+      .catch((error) => {
+        console.log(error);
+        setError(error.message);
+        setAuthing(false);
+      });
+  };
 
-                    {error && <div className='text-red-500 mb-4'>{error}</div>}
+  // Typing Effect with Loop
+  useEffect(() => {
+    if (index < typingEffectText.length) {
+      const timeoutId = setTimeout(() => {
+        setTypedText(typedText + typingEffectText[index]);
+        setIndex(index + 1);
+      }, 100);
+      return () => clearTimeout(timeoutId);
+    } else {
+      // Reset typing effect
+      const resetTimeout = setTimeout(() => {
+        setTypedText("");
+        setIndex(0);
+      }, 2000); // Pause for 2 seconds before restarting
+      return () => clearTimeout(resetTimeout);
+    }
+  }, [typedText, index]);
 
-                    <div className='w-full flex flex-col mb-4'>
-                        <button
-                            onClick={signUpWithEmail}
-                            disabled={authing}
-                            className='w-full bg-transparent border border-white text-white my-2 font-semibold rounded-md p-4 text-center flex items-center justify-center cursor-pointer'>
-                            Sign Up With Email and Password
-                        </button>
-                    </div>
-
-                    <div className='w-full flex items-center justify-center relative py-4'>
-                        <div className='w-full h-[1px] bg-gray-500'></div>
-                        <p className='text-lg absolute text-gray-500 bg-[#1a1a1a] px-2'>OR</p>
-                    </div>
-
-                    <button
-                        onClick={signUpWithGoogle}
-                        disabled={authing}
-                        className='w-full bg-white text-black font-semibold rounded-md p-4 text-center flex items-center justify-center cursor-pointer mt-7'>
-                        Sign Up With Google
-                    </button>
-                
-                    <div className='w-full flex items-center justify-center mt-10'>
-                        <p className='text-sm font-normal text-gray-400'>Already have an account? <span className='font-semibold text-white cursor-pointer underline'><a href='/login'>Log In</a></span></p>
-                    </div>
-
-                </div>
-             </div>
+  return (
+    <div className="w-full h-screen flex items-center justify-center bg-[#EDF2F7]">
+      {/* Main Container */}
+      <div className="flex w-full max-w-screen-lg h-[90vh] bg-white shadow-lg rounded-lg overflow-hidden">
+        {/* Left Side (Typing Animation) */}
+        <div className="w-1/2 flex items-center justify-center bg-[#2D3748]">
+          <div className="text-white text-4xl font-semibold max-w-[70%] text-center p-8">
+            <p>{typedText}</p>
+          </div>
         </div>
-    );
-}
+
+        {/* Right Side (Sign-Up Form) */}
+        <div className="w-1/2 flex items-center justify-center p-8">
+          <div className="w-full max-w-lg bg-white p-8 rounded-lg shadow-xl transform transition duration-500 hover:scale-105 hover:shadow-2xl">
+            <h2 className="text-4xl font-bold text-center text-[#4A90E2] mb-6">
+              Create Your Account
+            </h2>
+
+            <div className="space-y-6">
+              <input
+                type="email"
+                placeholder="Email Address"
+                className="w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A90E2] transition duration-300"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                className="w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A90E2] transition duration-300"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <input
+                type="password"
+                placeholder="Confirm Password"
+                className="w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A90E2] transition duration-300"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+
+              {error && (
+                <p className="text-red-500 text-center mt-2">{error}</p>
+              )}
+
+              <button
+                onClick={signUpWithEmail}
+                disabled={authing}
+                className="w-full py-3 bg-[#4A90E2] text-white font-semibold rounded-lg shadow-lg hover:bg-[#357ABD] transition duration-300 transform hover:scale-105"
+              >
+                {authing ? "Signing Up..." : "Sign Up with Email"}
+              </button>
+
+              <div className="text-center py-4">
+                <span className="text-gray-500">or</span>
+              </div>
+
+              <button
+                onClick={signUpWithGoogle}
+                disabled={authing}
+                className="w-full py-3 bg-white text-[#4A90E2] font-semibold rounded-lg shadow-lg border-2 border-[#4A90E2] hover:bg-[#E3F2FD] transition duration-300 transform hover:scale-105"
+              >
+                {authing ? "Signing Up..." : "Sign Up with Google"}
+              </button>
+
+              <div className="mt-6 text-center">
+                <p className="text-sm text-gray-500">
+                  Already have an account?{" "}
+                  <a
+                    href="/login"
+                    className="text-[#4A90E2] font-semibold hover:underline"
+                  >
+                    Log In
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default SignUp;
+
+
