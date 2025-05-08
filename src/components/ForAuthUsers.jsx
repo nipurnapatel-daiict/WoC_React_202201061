@@ -17,6 +17,11 @@ import { doc, collection, getFirestore, where } from "firebase/firestore";
 import app from "../App";
 import { useLocation } from "react-router-dom"; 
 import { updateDoc } from "firebase/firestore";
+import { MessageCircle } from "lucide-react";
+import Chatbot from "./Chatbot/Chatbot";
+
+import { getAuth, signOut } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 
 const encodeToBase64 = (str) => {
@@ -48,11 +53,29 @@ const ForAuthUsers = ({selectedFile, setSelectedFile}) => {
     const user = useUser();
     const db = getFirestore(app);
     const location = useLocation();
+    const auth = getAuth();
+    const navigate = useNavigate();
 
     const {content, language: fileLanguage, fileId, fileName} = selectedFile || {};
-// console.log("name at auth: ", fileName);
 
+    // for chatbot
+    const [isChatOpen, setIsChatOpen] = useState(false);
     
+    const toggleChat = () =>{
+        setIsChatOpen(prevState => !prevState);
+    }
+    
+    const handleLogout = async () => {
+    
+        try {
+          await signOut(auth); // Logs out the user
+          console.log("User logged out successfully");
+          navigate("/login"); // Redirects to login page
+          window.location.reload();
+        } catch (error) {
+          console.error("Error logging out: ", error);
+        }
+    };
 
 
     useEffect(() => {
@@ -97,6 +120,7 @@ const ForAuthUsers = ({selectedFile, setSelectedFile}) => {
     
     };
 
+    
     useEffect(() => {
         if (window.monaco) {
             if (theme === "dark") {
@@ -105,6 +129,70 @@ const ForAuthUsers = ({selectedFile, setSelectedFile}) => {
                 window.monaco.editor.setTheme("vs");
             } else if (theme === "hc-black") {
                 window.monaco.editor.setTheme("hc-black");
+            } else if (theme === "one-dark") {
+                monaco.editor.defineTheme('one-dark', {
+                    base: 'vs-dark', // Use 'vs-dark' as base
+                    inherit: true,
+                    rules: [
+                        { token: 'keyword', foreground: 'C586C0', fontStyle: 'bold' },
+                        { token: 'comment', foreground: '6A9955', fontStyle: 'italic' },
+                        // Add more rules for different token types as needed
+                    ],
+                    colors: {
+                        'editor.background': '#2d2d2d',
+                        'editor.foreground': '#d4d4d4',
+                        // Customize other color settings as needed
+                    }
+                });
+                window.monaco.editor.setTheme('one-dark');
+            } else if (theme === "solarized-dark") {
+                monaco.editor.defineTheme('solarized-dark', {
+                    base: 'vs-dark',
+                    inherit: true,
+                    rules: [
+                        { token: 'keyword', foreground: '859900', fontStyle: 'bold' },
+                        { token: 'comment', foreground: '93a1a1', fontStyle: 'italic' },
+                        // Define more token rules as needed
+                    ],
+                    colors: {
+                        'editor.background': '#002b36',
+                        'editor.foreground': '#839496',
+                        // Customize other colors here
+                    }
+                });
+                window.monaco.editor.setTheme('solarized-dark');
+            } else if (theme === "one-light") {
+                monaco.editor.defineTheme('one-light', {
+                    base: 'vs', // Use 'vs' (light theme) as base
+                    inherit: true,
+                    rules: [
+                        { token: 'keyword', foreground: '007acc', fontStyle: 'bold' },
+                        { token: 'comment', foreground: '6a9955', fontStyle: 'italic' },
+                        // Add more rules for different token types as needed
+                    ],
+                    colors: {
+                        'editor.background': '#fafafa',
+                        'editor.foreground': '#383a42',
+                        // Customize other color settings as needed
+                    }
+                });
+                window.monaco.editor.setTheme('one-light');
+            } else if (theme === "solarized-light") {
+                monaco.editor.defineTheme('solarized-light', {
+                    base: 'vs',
+                    inherit: true,
+                    rules: [
+                        { token: 'keyword', foreground: '268bd2', fontStyle: 'bold' },
+                        { token: 'comment', foreground: '2aa198', fontStyle: 'italic' },
+                        // Define more token rules as needed
+                    ],
+                    colors: {
+                        'editor.background': '#fdf6e3',
+                        'editor.foreground': '#586e75',
+                        // Customize other colors here
+                    }
+                });
+                window.monaco.editor.setTheme('solarized-light');
             }
         }
     }, [theme]);
@@ -112,7 +200,7 @@ const ForAuthUsers = ({selectedFile, setSelectedFile}) => {
 
     const handleThemeChange = (selectedTheme) => {
         setTheme(selectedTheme);
-        document.body.classList.remove("light", "dark", "hc-black");
+        document.body.classList.remove("light", "dark", "hc-black", "one-dark", "solarized-dark", "one-light", "solarized-light");
         document.body.classList.add(selectedTheme);
     };
 
@@ -121,6 +209,7 @@ const mapLangugae = (fileLanguage) => {
         py : "python",
         js : "javascript",
         cpp : "cpp",
+        
     }
 
     return languageMap[fileLanguage] || fileLanguage;
@@ -216,16 +305,31 @@ const runCode = async () => {
                 </div>
 
                 {/* Right section */}
-                <div className="flex items-center space-x-3">
-                    <Themes theme={theme} onSelect={handleThemeChange} />
-                    <button onClick={toggleWrapping} className="flex items-center space-x-2 bg-gray-600 hover:bg-gray-800 text-white px-3 py-2 rounded-md text-sm">
+                
+                <div className="relative">
+                    <div className="flex items-center space-x-3">
+                        <Themes theme={theme} onSelect={handleThemeChange} />
+                        <button onClick={toggleWrapping} className="flex items-center space-x-2 bg-gray-600 hover:bg-gray-800 text-white px-3 py-2 rounded-md text-sm">
                         <SquareChevronRight className="w-4 h-4" />
                         <span className="text-xs">{isWrappingEnabled ? "Disable Wrapping" : "Enable Wrapping"}</span>
+                        </button>
+
+                        <button 
+                        onClick={handleLogout}
+                        className="flex items-center space-x-2 bg-gray-600 hover:bg-purple-800 text-white px-3 py-2 rounded-md text-sm">
+                        <span className="text-xs">Logout</span>
+                        </button>
+                    </div>
+                    <button
+                        onClick={downloadCode}
+                        className="absolute bottom-[-1] m-2 right-4 bg-gray-600 hover:bg-purple-800 text-white p-2 rounded-md shadow-lg flex items-center justify-center"
+                    >
+                        <Download className="w-6 h-6" />
                     </button>
-                    <button onClick={downloadCode} className="flex items-center space-x-2 bg-gray-600 hover:bg-purple-800 text-white px-3 py-0 rounded-md text-sm h-8">
-                        <Download className="w-4 h-4" />
-                    </button>
+
                 </div>
+
+
 
             </div>
 
@@ -233,21 +337,6 @@ const runCode = async () => {
 
             {/* Code editor */}
             <div className="flex-1 overflow-hidden">
-                {/* <div className="flex space-x-2 overflow-x-auto py-2 px-4 bg-gray-100 border-b-2">
-                {openFiles.map((file) => (
-                    <div key={file.id} className="flex items-center space-x-2 bg-gray-200 px-4 py-2 rounded-lg">
-                    <span className="text-sm text-gray-700">{file.name}</span>
-                    <button
-                        // onClick={() => handleCloseFile(file.id)}
-                        className="text-red-500 hover:text-red-700"
-                    >
-                        X
-                    </button>
-                    </div>
-                ))}
-                </div> */}
-
-
             <Editor
                 language={mapLangugae(fileLanguage)}
                 theme="vs-light" 
@@ -306,155 +395,25 @@ const runCode = async () => {
                 onSubmit={handleFileNameSubmit}
                 defaultFileName={`code${file_extensions.find(ext => ext[language])?.[language]}`}
             /> */}
-        </div>
-    );
-};
+
+        <button
+            onClick={() => setIsChatOpen((prev) => !prev)} // Toggle chat window visibility
+            className="fixed bottom-6 right-6 bg-purple-600 text-white p-4 rounded-full shadow-lg hover:bg-purple-800 transition duration-300"
+        >
+            <MessageCircle className="w-6 h-6" />
+        </button>
+
+        {/* ----------------------Chatbot Component------------------- */}
+        {isChatOpen && (
+            <div className="fixed bottom-6 right-6 z-50">
+                <Chatbot closeChat={toggleChat} /> {/* Your Chatbot component */}
+            </div>
+        )}
+
+                </div>
+            );
+        };
 
 export default ForAuthUsers;
 
 
-
-
-
-
-{/* <div className="flex space-x-2 overflow-x-auto py-2 px-4 bg-gray-100 border-b-2">
-          {openFiles.map((file) => (
-            <div key={file.id} className="flex items-center space-x-2 bg-gray-200 px-4 py-2 rounded-lg">
-              <span className="text-sm text-gray-700">{file.name}</span>
-              <button
-                onClick={() => handleCloseFile(file.id)}
-                className="text-red-500 hover:text-red-700"
-              >
-                X
-              </button>
-            </div>
-          ))}
-        </div> */}
-
-
-
-
-
-
-//     const runCode = async () => {
-//     if (!language) {
-//         toast.error("Please select a programming language before running the code.");
-//         return;
-//     }
-
-//     const sourceCode = editorRef.current?.getValue();
-//     if (!sourceCode) {
-//         toast.error("Code editor is empty. Please write some code before running.");
-//         return;
-//     }
-
-//     setIsLoading(true);
-//     setOutput("");
-
-//     try {
-//         // Ensure the selected language is valid before executing
-//         if (!Object.keys(CODE_SNIPPETS).includes(language)) {
-//             toast.error("Unsupported language selected.");
-//             setIsLoading(false);
-//             return;
-//         }
-
-//         const { run: result } = await executeCode(language, sourceCode, inputData);
-//         result.stderr ? setIsError(true) : setIsError(false);
-
-//         if (result && result.output) {
-//             setOutput(result.output.split("\n"));
-//             setIsOutputVisible(true);
-//         } else {
-//             setOutput(["No output returned"]);
-//         }
-
-//         setShowOutput(true);
-//         setCodeRan(true);
-//     } catch (error) {
-//         toast.error(error.message || "Unable to run code", {
-//             position: "top-right",
-//             autoClose: 5000,
-//         });
-
-//         setOutput(["Error: " + error.message]);
-//         setIsError(true);
-//     } finally {
-//         setIsLoading(false);
-//     }
-// };
-
-
-
-
-
-    // FETCH FILES FOR USER 
-    // useEffect(() => {
-    //     const fetchFiles = async () => {
-    //         try {
-    //             const userFiles = collection(db, "Files");
-    //             const q = query(userFiles, where("createdBy", "==", user.email));
-    //             const querySnapshot = await getDocs(q);
-
-    //             const files = querySnapshot.docs.map((doc) => ({
-    //                 id: doc.id,
-    //                 ...doc.data(),
-    //             }));
-
-    //             setOpenedFiles(files);
-    //             if (files.length > 0) {
-    //                 setValue(files[0].content);  // Set content of the first file
-    //                 setLanguage(files[0].type);  // Set language of the first file
-    //                 setCustomFileName(files[0].name);  // Set file name
-    //             }
-
-    //         } catch (error) {
-    //             console.error("Error fetching files:", error);
-    //             toast.error("Error loading files.");
-    //         }
-    //     };
-
-    //     if (user?.email) { // Ensure user is logged in and has an email
-    //         fetchFiles();
-    //     }
-    // }, [user?.email])
-
-    // useEffect(() => {
-    //     if (selectedFile) {
-    //         const fileNameWithComment = `// ${selectedFile.name}\n\n${selectedFile.content}`;
-    //         setValue( fileNameWithComment + selectedFile.content);
-    //         setLanguage(selectedFile.language);
-    //         setCustomFileName(selectedFile.fileName);
-    //     }
-    // }, [selectedFile]);
-
-    // const handleEditorChange = (newCode) => {
-    //     setValue(newCode);
-    //     if (user?.email) {
-    //         saveCodeToFirestore(newCode);  // Save code to Firestore when it changes
-    //     }
-    // };
-
-    // const saveCodeToFirestore = async (code) => {
-    //     if (!user?.email) return;
-    
-    //     const codeRef = doc(db, "Files", `${user.email}_${customFileName || 'Untitled'}`); // Use customFileName for document ID
-    
-    //     try {
-    //         await setDoc(codeRef, {
-    //             content: code,               // Save the code content
-    //             language: language,          // Save the language used
-    //             createdBy: user.email,       // Save the user's email
-    //             name: customFileName || 'Untitled',  // Name field (can be 'Untitled' by default)
-    //             type: "txt",                 // Save file type, you can adjust this based on actual file type
-    //             size: code.length,           // Save the size (you can adjust if required)
-    //             modifiedAt: Date.now(),      // Store the timestamp of the modification
-    //         });
-    //         console.log("Code saved to Firestore.");
-    //     } catch (error) {
-    //         toast.error("Error saving code to Firestore.");
-    //         console.error("Error saving code:", error);
-    //     }
-    // };
-    
-    

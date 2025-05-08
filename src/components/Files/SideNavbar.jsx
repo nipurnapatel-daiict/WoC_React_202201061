@@ -12,7 +12,7 @@ const SideNavbar = ({ addNewFolder, addNewFile }) => {
   // const [fileList, setFileList] = useState([]);
 
   return (
-    <div className="w-full bg-white h-[8%] sticky top-0 z-10 shadow-blue-200 shadow-md p-2">
+    <div className="w-full bg-white h-[8%] rounded-md sticky top-0 z-10 shadow-blue-200 shadow-md p-2">
       {/* <div className="flex justify-center mb-1">
         <span>Welcome!</span>
       </div> */}
@@ -51,7 +51,7 @@ const SideNavbar = ({ addNewFolder, addNewFile }) => {
             <h2
               onClick={() => setActiveIndex(index)}
               className={`flex items-center justify-center p-1 rounded-lg cursor-pointer text-gray-500
-                ${activeIndex === index ? 'bg-blue-500 text-white' : 'hover:bg-blue-400 hover:text-white'}`}
+                ${activeIndex === index ? 'bg-purple-500 text-white' : 'hover:bg-purple-400 hover:text-white'}`}
             >
               {item.logo} {/* Display only the icon/logo */}
             </h2>

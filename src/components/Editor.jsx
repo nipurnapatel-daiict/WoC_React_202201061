@@ -13,6 +13,9 @@ import { Download } from 'lucide-react';
 import FileNameModal from "./Filemodel";
 import { CodeXml } from 'lucide-react';
 import { Terminal } from 'lucide-react';
+import Chatbot from "./Chatbot/Chatbot";
+import { MessageCircle } from 'lucide-react';
+
 
 const encodeToBase64 = (str) => {
     return btoa(str);
@@ -41,6 +44,14 @@ const CodeBoard = () => {
 
     const [userID, setUserId] = useState(null);
     const [hasShownToast, setHasShownToast] = useState(false);
+
+    // for chatbot
+    const [isChatOpen, setIsChatOpen] = useState(false);
+
+    const toggleChat = () =>{
+        setIsChatOpen(prevState => !prevState);
+    }
+
 
     useEffect(() => {
         let storedUserID = localStorage.getItem('userID');
@@ -105,6 +116,7 @@ const CodeBoard = () => {
         );
     };
 
+
     useEffect(() => {
         if (window.monaco) {
             if (theme === "dark") {
@@ -113,9 +125,75 @@ const CodeBoard = () => {
                 window.monaco.editor.setTheme("vs");
             } else if (theme === "hc-black") {
                 window.monaco.editor.setTheme("hc-black");
+            } else if (theme === "one-dark") {
+                monaco.editor.defineTheme('one-dark', {
+                    base: 'vs-dark', // Use 'vs-dark' as base
+                    inherit: true,
+                    rules: [
+                        { token: 'keyword', foreground: 'C586C0', fontStyle: 'bold' },
+                        { token: 'comment', foreground: '6A9955', fontStyle: 'italic' },
+                        // Add more rules for different token types as needed
+                    ],
+                    colors: {
+                        'editor.background': '#2d2d2d',
+                        'editor.foreground': '#d4d4d4',
+                        // Customize other color settings as needed
+                    }
+                });
+                window.monaco.editor.setTheme('one-dark');
+            } else if (theme === "solarized-dark") {
+                monaco.editor.defineTheme('solarized-dark', {
+                    base: 'vs-dark',
+                    inherit: true,
+                    rules: [
+                        { token: 'keyword', foreground: '859900', fontStyle: 'bold' },
+                        { token: 'comment', foreground: '93a1a1', fontStyle: 'italic' },
+                        // Define more token rules as needed
+                    ],
+                    colors: {
+                        'editor.background': '#002b36',
+                        'editor.foreground': '#839496',
+                        // Customize other colors here
+                    }
+                });
+                window.monaco.editor.setTheme('solarized-dark');
+            } else if (theme === "one-light") {
+                monaco.editor.defineTheme('one-light', {
+                    base: 'vs', // Use 'vs' (light theme) as base
+                    inherit: true,
+                    rules: [
+                        { token: 'keyword', foreground: '007acc', fontStyle: 'bold' },
+                        { token: 'comment', foreground: '6a9955', fontStyle: 'italic' },
+                        // Add more rules for different token types as needed
+                    ],
+                    colors: {
+                        'editor.background': '#fafafa',
+                        'editor.foreground': '#383a42',
+                        // Customize other color settings as needed
+                    }
+                });
+                window.monaco.editor.setTheme('one-light');
+            } else if (theme === "solarized-light") {
+                monaco.editor.defineTheme('solarized-light', {
+                    base: 'vs',
+                    inherit: true,
+                    rules: [
+                        { token: 'keyword', foreground: '268bd2', fontStyle: 'bold' },
+                        { token: 'comment', foreground: '2aa198', fontStyle: 'italic' },
+                        // Define more token rules as needed
+                    ],
+                    colors: {
+                        'editor.background': '#fdf6e3',
+                        'editor.foreground': '#586e75',
+                        // Customize other colors here
+                    }
+                });
+                window.monaco.editor.setTheme('solarized-light');
             }
         }
     }, [theme]);
+
+    
 
     const handleThemeChange = (selectedTheme) => {
         setTheme(selectedTheme);
@@ -126,6 +204,8 @@ const CodeBoard = () => {
     const runCode = async () => {
         const sourceCode = editorRef.current.getValue();
         if (!sourceCode) return;
+
+        console.log("Running code in language: ", language)
     
         setIsLoading(true);
         setOutput(""); 
@@ -149,8 +229,10 @@ const CodeBoard = () => {
                 position: "top-right",
                 autoClose: 5000,
             });
-    
-            setOutput(["Error: " + error.message]);
+            setOutput([
+                <span style={{ color: 'red' }}>Error: {error.message}</span>
+            ]);
+          //  setOutput(["Error: " + error.message]);
             setIsError(true);
         } finally {
             setIsLoading(false);
@@ -210,16 +292,23 @@ const CodeBoard = () => {
                 </div>
 
                 {/* Right section */}
-                <div className="flex items-center space-x-3">
-                    <Themes theme={theme} onSelect={handleThemeChange} />
-                    <button onClick={toggleWrapping} className="flex items-center space-x-2 bg-gray-600 hover:bg-gray-800 text-white px-3 py-2 rounded-md text-sm">
+
+                <div className="relative">
+                    <div className="flex items-center space-x-3">
+                        <Themes theme={theme} onSelect={handleThemeChange} />
+                        <button onClick={toggleWrapping} className="flex items-center space-x-2 bg-gray-600 hover:bg-gray-800 text-white px-3 py-2 rounded-md text-sm">
                         <SquareChevronRight className="w-4 h-4" />
                         <span className="text-xs">{isWrappingEnabled ? "Disable Wrapping" : "Enable Wrapping"}</span>
-                    </button>
-                    <button onClick={downloadCode} className="flex items-center space-x-2 bg-gray-600 hover:bg-purple-800 text-white px-3 py-0 rounded-md text-sm h-8">
-                        <Download className="w-4 h-4" />
+                        </button>
+                    </div>
+                    <button
+                        onClick={downloadCode}
+                        className="absolute bottom-[-1] m-2 right-4 bg-gray-600 hover:bg-purple-800 text-white p-2 rounded-md shadow-lg flex items-center justify-center"
+                    >
+                        <Download className="w-6 h-6" />
                     </button>
                 </div>
+
             </div>
 
             {/* Code editor */}
@@ -275,8 +364,27 @@ const CodeBoard = () => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSubmit={handleFileNameSubmit}
-                defaultFileName={`code${file_extensions.find(ext => ext[language])?.[language]}`}
+               // defaultFileName={`code${file_extensions.find(ext => ext[language])?.[language]}`}
+               defaultFileName=""
             />
+
+
+{/* ----------------------Floating point------------------- */}
+
+        <button
+            onClick={() => setIsChatOpen((prev) => !prev)} // Toggle chat window visibility
+            className="fixed bottom-6 right-6 bg-purple-600 text-white p-4 rounded-full shadow-lg hover:bg-purple-800 transition duration-300"
+        >
+            <MessageCircle className="w-6 h-6" />
+        </button>
+
+        {/* ----------------------Chatbot Component------------------- */}
+        {isChatOpen && (
+            <div className="fixed bottom-6 right-6 z-50">
+                <Chatbot closeChat={toggleChat} /> {/* Your Chatbot component */}
+            </div>
+        )}
+
         </div>
     );
 };

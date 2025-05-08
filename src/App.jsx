@@ -9,6 +9,8 @@ import Dashboard from "./components/Files/Dashboard";
 import { UserProvider } from "./context/UserContext";
 // import FolderId from "./components/Files/[FolderId]";
 // import ForAuthUsers from "./components/ForAuthUsers";
+import Chatbot from "./components/Chatbot/Chatbot";
+import ForgotPassword from "./pages/ForgotPassword";
 
 import { initializeApp } from "firebase/app";
 
@@ -32,8 +34,17 @@ const App = () => {
           <Route path="/code-editor" element={<CodeEditor />} />
           <Route path="/login" element={<AuthRoute> <Login /> </AuthRoute>} />
           <Route path ="/signup" element={<SignUp />} />
-          {/* <Route path ="/forauth" element={<ForAuthUsers />} /> */}
-          <Route path ="/files/*" element={<Dashboard />} />
+          {/* Protect the dashboard route */}
+          <Route
+            path="/files/*"
+            element={
+              <AuthRoute>
+                <Dashboard />
+              </AuthRoute>
+            }
+          />
+          <Route path="/ai" element={<Chatbot />} /> 
+          <Route path="/forgot-password" element={<ForgotPassword />}/>
           {/* <Route path="/files/folder/:id" element={<FolderId />} /> */}
         </Routes>
       </Router>
